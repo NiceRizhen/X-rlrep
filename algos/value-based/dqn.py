@@ -1,166 +1,183 @@
-import random
 import gym
 import numpy as np
-from collections import deque
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.optimizers import Adam
+import tensorflow as tf
 from rllab.algos.base import RLAlgorithm
+from rllab.algos.agent import Agent
+from rllab.algos.train_agent import trainAgent
 
-class DQNAgent:
+np.random.seed(1)
+tf.set_random_seed(1)
+
+class DQNAgent(Agent):
     def __init__(
             self,
-            state_size,
-            action_size,
-            gamma,
-            epsilon,
-            epsilon_min,
-            epsilon_decay,
-            learning_rate):
-        self.state_size = state_size
-        self.action_size = action_size
-        self.memory = deque(maxlen=2000)
-        self.gamma = gamma    # discount rate
-        self.epsilon = epsilon  # exploration rate
-        self.epsilon_min = epsilon_min
-        self.epsilon_decay = epsilon_decay
-        self.learning_rate = learning_rate
-        self.model = self._build_model()
+            n_actions,
+            n_features,
+            learning_rate,
+            reward_decay,
+            e_greedy,
+            replace_target_iter,
+            memory_size,
+            batch_size,
+            e_greedy_increment=None,
+            output_graph=False,
+            sess=None,
+    ):
+        self.n_actions = n_actions
+        self.n_features = n_features
+        self.lr = learning_rate
+        self.gamma = reward_decay
+        self.epsilon_max = e_greedy
+        self.replace_target_iter = replace_target_iter
+        self.memory_size = memory_size
+        self.batch_size = batch_size
+        self.batch_size = batch_size
+        self.epsilon_increment = e_greedy_increment
+        self.epsilon = 0 if e_greedy_increment is not None else self.epsilon_max
+        self.learn_step_counter = 0
+        self.memory = np.zeros((self.memory_size, n_features*2+2))
+        self._build_net()
+        t_params = tf.get_collection('target_net_params')
+        e_params = tf.get_collection('eval_net_params')
+        self.replace_target_op = [tf.assign(t, e) for t, e in zip(t_params, e_params)]
 
-    def _build_model(self):
-        # Neural Net for Deep-Q learning Model
+        if sess is None:
+            self.sess = tf.Session()
+            self.sess.run(tf.global_variables_initializer())
+        else:
+            self.sess = sess
+        if output_graph:
+            tf.summary.FileWriter("logs/", self.sess.graph)
+        self.cost_his = []
 
-        # Sequential() creates the foundation of the layers.
-        model = Sequential()
+    def _build_net(self):
+        def build_layers(s, c_names, n_l1, w_initializer, b_initializer):
+            with tf.variable_scope('l1'):
+                w1 = tf.get_variable('w1', [self.n_features, n_l1], initializer=w_initializer, collections=c_names)
+                b1 = tf.get_variable('b1', [1, n_l1], initializer=b_initializer, collections=c_names)
+                l1 = tf.nn.relu(tf.matmul(s, w1) + b1)
 
-        # 'Dense' is the basic form of a neural network layer
-        # Input Layer of state size(4) and Hidden Layer with 24 nodes
-        model.add(Dense(24, input_dim=self.state_size, activation='relu'))
-        # Hidden layer with 24 nodes
-        model.add(Dense(24, activation='relu'))
-        # Output Layer with # of actions: 2 nodes (left, right)
-        model.add(Dense(self.action_size, activation='linear'))
-        # Create the model based on the information above
-        model.compile(loss='mse',
-                      optimizer=Adam(lr=self.learning_rate))
-        return model
 
-    def remember(self, state, action, reward, next_state, done):
-        self.memory.append((state, action, reward, next_state, done))
+            with tf.variable_scope('Q'):
+                w2 = tf.get_variable('w2', [n_l1, self.n_actions], initializer=w_initializer, collections=c_names)
+                b2 = tf.get_variable('b2', [1, self.n_actions], initializer=b_initializer, collections=c_names)
+                out = tf.matmul(l1, w2) + b2
 
-    def act(self, state):
-        if np.random.rand() <= self.epsilon:
-            # The agent acts randomly
-            return random.randrange(self.action_size)
+            return out
 
-        # Predict the reward value based on the given state
-        act_values = self.model.predict(state)
+        # ------------------ build evaluate_net ------------------
+        self.s = tf.placeholder(tf.float32, [None, self.n_features], name='s')  # input
+        self.q_target = tf.placeholder(tf.float32, [None, self.n_actions], name='Q_target')  # for calculating loss
 
-        # Pick the action based on the predicted reward
-        return np.argmax(act_values[0])  # returns action
+        with tf.variable_scope('eval_net'):
+            c_names, n_l1, w_initializer, b_initializer = ['eval_net_params', tf.GraphKeys.GLOBAL_VARIABLES], 20, tf.random_normal_initializer(0., 0.3), tf.constant_initializer(0.1)  # config of layers
 
-    def replay(self, batch_size):
-        # Sample minibatch from the memory
-        minibatch = random.sample(self.memory, batch_size)
+            self.q_eval = build_layers(self.s, c_names, n_l1, w_initializer, b_initializer)
 
-        # Extract informations from each memory
-        for state, action, reward, next_state, done in minibatch:
+        with tf.variable_scope('loss'):
+            self.loss = tf.reduce_mean(tf.squared_difference(self.q_target, self.q_eval))
 
-            # if done, make our target reward
-            target = reward
-            if not done:
-                # predict the future discounted reward
-                target = (reward + self.gamma *
-                          np.amax(self.model.predict(next_state)[0]))
+        with tf.variable_scope('train'):
+            self._train_op = tf.train.RMSPropOptimizer(self.lr).minimize(self.loss)
 
-            # make the agent to approximately map
-            # the current state to future discounted reward
-            # We'll call that target_f
-            target_f = self.model.predict(state)
-            target_f[0][action] = target
+        # ------------------ build target_net ------------------
+        self.s_ = tf.placeholder(tf.float32, [None, self.n_features], name='s_')    # input
 
-            # Train the Neural Net with the state and target_f
-            self.model.fit(state, target_f, epochs=1, verbose=0)
-        if self.epsilon > self.epsilon_min:
-            self.epsilon *= self.epsilon_decay
+        with tf.variable_scope('target_net'):
+            c_names = ['target_net_params', tf.GraphKeys.GLOBAL_VARIABLES]
 
-    def load(self, name):
-        self.model.load_weights(name)
+            self.q_next = build_layers(self.s_, c_names, n_l1, w_initializer, b_initializer)
 
-    def save(self, name):
-        self.model.save_weights(name)
+    def observe(self, state, action, reward, newState, terminated):
+        if not hasattr(self, 'memory_counter'):
+            self.memory_counter = 0
+        transition = np.hstack((state, [action, reward], newState))
+        index = self.memory_counter % self.memory_size
+        self.memory[index, :] = transition
+        self.memory_counter += 1
+
+    def trainPolicy(self, state):
+        state = state[np.newaxis, :]
+        if np.random.uniform() < self.epsilon:  # choosing action
+            actions_value = self.sess.run(self.q_eval, feed_dict={self.s: state})
+            action = np.argmax(actions_value)
+        else:
+            action = np.random.randint(0, self.n_actions)
+        return action
+
+    def runPolicy(self, state):
+        pass
+
+    def learn(self):
+        if self.learn_step_counter % self.replace_target_iter == 0:
+            self.sess.run(self.replace_target_op)
+            # print('\ntarget_params_replaced\n')
+
+        sample_index = np.random.choice(self.memory_size, size=self.batch_size)
+        batch_memory = self.memory[sample_index, :]
+
+        q_next = self.sess.run(self.q_next, feed_dict={self.s_: batch_memory[:, -self.n_features:]}) # next observation
+        q_eval = self.sess.run(self.q_eval, {self.s: batch_memory[:, :self.n_features]})
+
+        q_target = q_eval.copy()
+
+        batch_index = np.arange(self.batch_size, dtype=np.int32)
+        eval_act_index = batch_memory[:, self.n_features].astype(int)
+        reward = batch_memory[:, self.n_features + 1]
+
+        q_target[batch_index, eval_act_index] = reward + self.gamma * np.max(q_next, axis=1)
+
+        _, self.cost = self.sess.run([self._train_op, self.loss],
+                                     feed_dict={self.s: batch_memory[:, :self.n_features],
+                                                self.q_target: q_target})
+        self.cost_his.append(self.cost)
+
+        self.epsilon = self.epsilon + self.epsilon_increment if self.epsilon < self.epsilon_max else self.epsilon_max
+        self.learn_step_counter += 1
+
 
 class DQN(RLAlgorithm):
     def __init__(
             self,
             env,
+            memory_size,
+            action_space,
+            learning_rate,
+            reward_decay,
+            e_greedy,
+            replace_target_iter,
+            memory_size_2,
             batch_size,
-            episodes,
-            gamma,
-            epsilon,
-            epsilon_min,
-            epsilon_decay,
-            learning_rate):
-        self.env=env    # represents the game environment
+            ):
+        self.env=env
+        self.memory_size=memory_size
+        self.action_space=action_space
+        self.learning_rate=learning_rate
+        self.reward_decay=reward_decay
+        self.e_greedy=e_greedy
+        self.replace_target_iter=replace_target_iter
+        self.memory_size_2=memory_size_2
         self.batch_size=batch_size
-        self.episodes=episodes    # a number of games we want the agent to play.
-        self.state_size=env.observation_space.shape[0]
-        self.action_size=env.action_space.n
-        self.done=False    # whether the game is ended or not
-        self.gamma=gamma    # aka decay or discount rate, to calculate the future discounted reward.
-        self.epsilon=epsilon  # aka exploration rate, this is the rate in which an agent randomly decides its action rather than prediction.
-        self.epsilon_min=epsilon_min    # we want the agent to explore at least this amount.
-        self.epsilon_decay=epsilon_decay    # we want to decrease the number of explorations as it gets good at playing games.
-        self.learning_rate=learning_rate    # Determines how much neural net learns in each iteration.
 
     def train(self):
-        # initialize the agent
-        agent = DQNAgent(
-                self.state_size,
-                self.action_size,
-                self.gamma,
-                self.epsilon,
-                self.epsilon_min,
-                self.epsilon_decay,
-                self.learning_rate)
+        self.env = self.env.unwrapped
+        self.env.seed(1)
+        sess = tf.Session()
 
-        # Iterate the game
-        for e in range(self.episodes):
+        with tf.variable_scope('natural'):
+            DQN = DQNAgent(
+                n_actions=self.action_space,
+                n_features=2,
+                e_greedy_increment=0.001,
+                sess=sess,
+                output_graph=True,
+                learning_rate=self.learning_rate,
+                reward_decay=self.reward_decay,
+                e_greedy=self.e_greedy,
+                replace_target_iter=self.replace_target_iter,
+                memory_size=self.memory_size_2,
+                batch_size=self.batch_size)
 
-            # reset state in the beginning of each game
-            state = self.env.reset()
-            state = np.reshape(state, [1, self.state_size])
+        sess.run(tf.global_variables_initializer())
 
-            # time_t represents each frame of the game
-            # Our goal is to keep the pole upright as long as possible until score of 500
-            # the more time_t the more score
-            for time in range(500):
-                # turn this on if you want to render
-                # self.env.render()
-                # Decide action
-                action = agent.act(state)
-
-                # Advance the game to the next frame based on the action.
-                # Reward is 1 for every frame the pole survived
-                next_state, reward, self.done, _ = self.env.step(action)
-                reward = reward if not self.done else -10
-                next_state = np.reshape(next_state, [1, self.state_size])
-
-                # Remember the previous state, action, reward, and done
-                agent.remember(state, action, reward, next_state, self.done)
-
-                # make next_state the new current state for the next frame.
-                state = next_state
-
-                # done becomes True when the game ends
-                # ex) The agent drops the pole
-                if self.done:
-                    # print the score and break out of the loop
-                    self.env.reset()
-                    print("episode: {}/{}, score: {}, e: {:2}".format(e, self.episodes, time, agent.epsilon))
-
-            if len(agent.memory) > self.batch_size:
-                # train the agent with the experience of the episode
-                agent.replay(self.batch_size)
-            # if e % 10 == 0:
-            #    agent.save("./save/dqn_3.h5")
+        dqn = trainAgent(self, DQN)
