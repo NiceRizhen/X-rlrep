@@ -1,5 +1,5 @@
 from optimizers.penalty_lbfgs_optimizer import PenaltyLbfgsOptimizer
-from npo import NPO
+from .npo import NPO
 from core.serializable import Serializable
 
 

@@ -1,6 +1,6 @@
 import sys
 sys.path.append("..")
-from base import RLAlgorithm
+from .base import RLAlgorithm
 from misc.overrides import overrides
 from misc import special
 from misc import ext
