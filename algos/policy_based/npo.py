@@ -1,6 +1,6 @@
 from misc import ext
 from misc.overrides import overrides
-from batch_polopt import BatchPolopt
+from .batch_polopt import BatchPolopt
 from misc import logger as logger
 import theano
 import theano.tensor as TT

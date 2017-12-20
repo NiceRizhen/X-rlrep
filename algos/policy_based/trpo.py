@@ -1,4 +1,4 @@
-from npo import NPO
+from .npo import NPO
 from optimizers.conjugate_gradient_optimizer import ConjugateGradientOptimizer
 from core.serializable import Serializable
 
