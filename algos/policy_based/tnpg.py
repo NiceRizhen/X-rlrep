@@ -1,10 +1,11 @@
 from npo import NPO
 from optimizers.conjugate_gradient_optimizer import ConjugateGradientOptimizer
-from core.serializable import Serializable
+from misc import ext
 
-class TRPO(NPO):
+
+class TNPG(NPO):
     """
-    Trust Region Policy Optimization
+    Truncated Natural Policy Gradient.
     """
 
     def __init__(
@@ -13,7 +14,10 @@ class TRPO(NPO):
             optimizer_args=None,
             **kwargs):
         if optimizer is None:
+            default_args = dict(max_backtracks=1)
             if optimizer_args is None:
-                optimizer_args = dict()
+                optimizer_args = default_args
+            else:
+                optimizer_args = dict(default_args, **optimizer_args)
             optimizer = ConjugateGradientOptimizer(**optimizer_args)
-        super(TRPO, self).__init__(optimizer=optimizer, **kwargs)
+        super(TNPG, self).__init__(optimizer=optimizer, **kwargs)
