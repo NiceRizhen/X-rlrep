@@ -1,3 +1,5 @@
+import sys
+sys.path.append("..")
 import os
 import re
 import subprocess
@@ -6,7 +8,6 @@ import os.path as osp
 import pickle as pickle
 import inspect
 import hashlib
-import sys
 from contextlib import contextmanager
 
 import errno
@@ -969,7 +970,7 @@ def launch_ec2(params_list, exp_prefix, docker_image, code_full_path,
         IamInstanceProfile=dict(
             Name=aws_config["iam_instance_profile_name"],
         ),
-        **config.AWS_EXTRA_CONFIGS,
+        **config.AWS_EXTRA_CONFIGS
     )
 
     if len(instance_args["NetworkInterfaces"]) > 0:
