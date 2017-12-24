@@ -1,6 +1,6 @@
 import sys
 sys.path.append("..")
-from .base import RLAlgorithm
+from algos.base import RLAlgorithm
 from sampler import parallel_sampler
 from sampler.base import BaseSampler
 import misc.logger as logger
