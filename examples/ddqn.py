@@ -1,17 +1,18 @@
-from rllab.algos.ddqn import DDQN
+from algos.value_based.ddqn import DDQN
 import gym
 
-env_name = 'CartPole-v1'
+env_name = 'MountainCar-v0'
 env = gym.make(env_name)
 
 algo = DDQN(
     env=env,
+    memory_size=10000,
+    action_space=3,
+    learning_rate=0.001,
+    reward_decay=0.9,
+    e_greedy=0.9,
+    replace_target_iter=500,
+    memory_size_2=10000,
     batch_size=32,
-    episodes=5000,
-    gamma = 0.95,    # discount rate
-    epsilon = 1.0,  # exploration rate
-    epsilon_min = 0.01,
-    epsilon_decay = 0.99,
-    learning_rate = 0.001,
 )
 algo.train()
