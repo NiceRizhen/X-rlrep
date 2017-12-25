@@ -70,13 +70,13 @@ def run_experiment(argv):
         set_seed(args.seed)
 
     if args.n_parallel > 0:
-        from rllab.sampler import parallel_sampler
+        from sampler import parallel_sampler
         parallel_sampler.initialize(n_parallel=args.n_parallel)
         if args.seed is not None:
             parallel_sampler.set_seed(args.seed)
 
     if args.plot:
-        from rllab.plotter import plotter
+        from plotter import plotter
         plotter.init_worker()
 
     if args.log_dir is None:

@@ -1,12 +1,12 @@
 import numpy as np
 import pygame
-from rllab.envs.box2d.box2d_env import Box2DEnv
-from rllab.envs.box2d.parser import find_body
+from envs.box2d.box2d_env import Box2DEnv
+from envs.box2d.parser import find_body
 
-from rllab.core.serializable import Serializable
-from rllab.envs.box2d.parser.xml_box2d import _get_name
-from rllab.misc import autoargs
-from rllab.misc.overrides import overrides
+from core.serializable import Serializable
+from envs.box2d.parser.xml_box2d import _get_name
+from misc import autoargs
+from misc.overrides import overrides
 
 
 class CarParkingEnv(Box2DEnv, Serializable):
@@ -113,4 +113,3 @@ class CarParkingEnv(Box2DEnv, Serializable):
         if keys[pygame.K_DOWN]:
             go[0] = -10
         return go
-

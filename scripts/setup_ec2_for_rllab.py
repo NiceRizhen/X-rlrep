@@ -4,7 +4,7 @@ import sys
 import json
 import botocore
 import os
-from rllab.misc import console
+from misc import console
 from rllab import config
 from string import Template
 
@@ -120,7 +120,7 @@ def setup_iam():
         existing_role.load()
         # if role exists, delete and recreate
         if not query_yes_no(
-                "There is an existing role named rllab. Proceed to delete everything rllab-related and recreate?",
+                "There is an existing role named  Proceed to delete everything rllab-related and recreate?",
                 default="no"):
             sys.exit()
         print("Listing instance profiles...")

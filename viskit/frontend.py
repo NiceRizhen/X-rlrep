@@ -6,9 +6,9 @@ import os
 
 matplotlib.use('Agg')
 import flask  # import Flask, render_template, send_from_directory
-from rllab.misc.ext import flatten
-from rllab.viskit import core
-from rllab.misc import ext
+from misc.ext import flatten
+from viskit import core
+from misc import ext
 import sys
 import argparse
 import json
@@ -140,9 +140,9 @@ def make_plot_eps(plot_list, use_median=False, counter=0):
             y = list(plt.means)
             y_upper = list(plt.means + plt.stds)
             y_lower = list(plt.means - plt.stds)
-        plt.legend = plt.legend.replace('rllab.algos.trpo.TRPO', 'TRPO')
-        plt.legend = plt.legend.replace('rllab.algos.vpg.VPG', 'REINFORCE')
-        plt.legend = plt.legend.replace('rllab.algos.erwr.ERWR', 'ERWR')
+        plt.legend = plt.legend.replace('algos.trpo.TRPO', 'TRPO')
+        plt.legend = plt.legend.replace('algos.vpg.VPG', 'REINFORCE')
+        plt.legend = plt.legend.replace('algos.erwr.ERWR', 'ERWR')
         plt.legend = plt.legend.replace('sandbox.rein.algos.trpo_vime.TRPO', 'TRPO+VIME')
         plt.legend = plt.legend.replace('sandbox.rein.algos.vpg_vime.VPG', 'REINFORCE+VIME')
         plt.legend = plt.legend.replace('sandbox.rein.algos.erwr_vime.ERWR', 'ERWR+VIME')

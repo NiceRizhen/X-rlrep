@@ -1,11 +1,11 @@
 import numpy as np
 import pygame
-from rllab.envs.box2d.parser import find_body
+from envs.box2d.parser import find_body
 
-from rllab.core.serializable import Serializable
-from rllab.envs.box2d.box2d_env import Box2DEnv
-from rllab.misc import autoargs
-from rllab.misc.overrides import overrides
+from core.serializable import Serializable
+from envs.box2d.box2d_env import Box2DEnv
+from misc import autoargs
+from misc.overrides import overrides
 
 
 # Tornio, Matti, and Tapani Raiko. "Variational Bayesian approach for
@@ -64,4 +64,3 @@ class CartpoleSwingupEnv(Box2DEnv, Serializable):
             return np.asarray([+10])
         else:
             return np.asarray([0])
-

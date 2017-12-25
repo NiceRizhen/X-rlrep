@@ -1,11 +1,11 @@
 import numpy as np
 import pygame
-from rllab.envs.box2d.parser import find_body
+from envs.box2d.parser import find_body
 
-from rllab.core.serializable import Serializable
-from rllab.envs.box2d.box2d_env import Box2DEnv
-from rllab.misc import autoargs
-from rllab.misc.overrides import overrides
+from core.serializable import Serializable
+from envs.box2d.box2d_env import Box2DEnv
+from misc import autoargs
+from misc.overrides import overrides
 
 
 class MountainCarEnv(Box2DEnv, Serializable):
@@ -60,4 +60,3 @@ class MountainCarEnv(Box2DEnv, Serializable):
             return np.asarray([+1])
         else:
             return np.asarray([0])
-

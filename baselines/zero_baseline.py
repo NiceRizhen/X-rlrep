@@ -1,6 +1,6 @@
 import numpy as np
-from rllab.baselines.base import Baseline
-from rllab.misc.overrides import overrides
+from baselines.base import Baseline
+from misc.overrides import overrides
 
 
 class ZeroBaseline(Baseline):

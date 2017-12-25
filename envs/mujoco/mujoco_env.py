@@ -2,12 +2,12 @@ import numpy as np
 import os.path as osp
 from cached_property import cached_property
 
-from rllab import spaces
-from rllab.envs.base import Env
-from rllab.misc.overrides import overrides
-from rllab.mujoco_py import MjModel, MjViewer
-from rllab.misc import autoargs
-from rllab.misc import logger
+import spaces
+from envs.base import Env
+from misc.overrides import overrides
+from mujoco_py import MjModel, MjViewer
+from misc import autoargs
+from misc import logger
 import theano
 import tempfile
 import os
@@ -221,7 +221,7 @@ class MujocoEnv(Env):
 
     def release(self):
         # temporarily alleviate the issue (but still some leak)
-        from rllab.mujoco_py.mjlib import mjlib
+        from mujoco_py.mjlib import mjlib
         mjlib.mj_deleteModel(self.model._wrapped)
         mjlib.mj_deleteData(self.data._wrapped)
 

@@ -1,10 +1,10 @@
-from rllab.envs.base import Step
-from rllab.misc.overrides import overrides
+from envs.base import Step
+from misc.overrides import overrides
 from .mujoco_env import MujocoEnv
 import numpy as np
-from rllab.core.serializable import Serializable
-from rllab.misc import logger
-from rllab.misc import autoargs
+from core.serializable import Serializable
+from misc import logger
+from misc import autoargs
 
 
 class SwimmerEnv(MujocoEnv, Serializable):

@@ -28,14 +28,14 @@ def generate_hills(width, height, nhills):
     x, y = np.mgrid[xmin:xmax:STEP, ymin:ymax:STEP]
     pos = np.empty(x.shape + (2,))
     pos[:, :, 0] = x; pos[:, :, 1] = y
-    
+
     # generate hilltops
     xm, ym = np.mgrid[xmin:xmax:width/np.sqrt(nhills), ymin:ymax:height/np.sqrt(nhills)]
     mu = np.c_[xm.flat, ym.flat]
     sigma = float(width*height)/(nhills*8)
     for i in range(mu.shape[0]):
         mu[i] = multivariate_normal.rvs(mean=mu[i], cov=sigma)
-    
+
     # generate hills
     sigma = sigma + sigma*np.random.rand(mu.shape[0])
     rvs = [ multivariate_normal(mu[i,:], cov=sigma[i]) for i in range(mu.shape[0]) ]
@@ -44,32 +44,32 @@ def generate_hills(width, height, nhills):
 
 def clear_patch(hfield, box):
     ''' Clears a patch shaped like box, assuming robot is placed in center of hfield
-    @param box: rllab.spaces.Box-like
+    @param box: spaces.Box-like
     '''
     if box.flat_dim > 2:
         raise ValueError("Provide 2dim box")
-    
+
     # clear patch
     h_center = int(0.5 * hfield.shape[0])
     w_center = int(0.5 * hfield.shape[1])
     fromrow, torow = w_center + int(box.low[0]/STEP), w_center + int(box.high[0] / STEP)
     fromcol, tocol = h_center + int(box.low[1]/STEP), h_center + int(box.high[1] / STEP)
     hfield[fromrow:torow, fromcol:tocol] = 0.0
-    
+
     # convolve to smoothen edges somewhat, in case hills were cut off
     K = np.ones((10,10)) / 100.0
     s = convolve2d(hfield[fromrow-9:torow+9, fromcol-9:tocol+9], K, mode='same', boundary='symm')
     hfield[fromrow-9:torow+9, fromcol-9:tocol+9] = s
-    
+
     return hfield
-    
+
 def _checkpath(path_):
     if path_ is None:
         path_ = DEFAULT_PATH
     if not os.path.exists(path_):
         os.makedirs(path_)
     return path_
-        
+
 def save_heightfield(x, y, hfield, fname, path=None):
     '''
     @param path, str (optional). If not provided, DEFAULT_PATH is used. Make sure the path + fname match the <file> attribute

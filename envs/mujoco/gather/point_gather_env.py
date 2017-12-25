@@ -1,5 +1,5 @@
-from rllab.envs.mujoco.gather.gather_env import GatherEnv
-from rllab.envs.mujoco.point_env import PointEnv
+from envs.mujoco.gather.gather_env import GatherEnv
+from envs.mujoco.point_env import PointEnv
 
 
 class PointGatherEnv(GatherEnv):

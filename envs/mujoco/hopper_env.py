@@ -1,11 +1,11 @@
 import numpy as np
 
-from rllab.core.serializable import Serializable
-from rllab.envs.base import Step
-from rllab.envs.mujoco.mujoco_env import MujocoEnv
-from rllab.misc import autoargs
-from rllab.misc import logger
-from rllab.misc.overrides import overrides
+from core.serializable import Serializable
+from envs.base import Step
+from envs.mujoco.mujoco_env import MujocoEnv
+from misc import autoargs
+from misc import logger
+from misc.overrides import overrides
 
 
 # states: [

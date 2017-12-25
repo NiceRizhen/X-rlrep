@@ -1,10 +1,10 @@
 import numpy as np
 
-from rllab.core.serializable import Serializable
-from rllab.envs.base import Step
-from rllab.envs.proxy_env import ProxyEnv
-from rllab.misc import autoargs
-from rllab.misc.overrides import overrides
+from core.serializable import Serializable
+from envs.base import Step
+from envs.proxy_env import ProxyEnv
+from misc import autoargs
+from misc.overrides import overrides
 
 
 class NoisyObservationEnv(ProxyEnv, Serializable):
@@ -76,4 +76,3 @@ class DelayedActionEnv(ProxyEnv, Serializable):
             action
         ])
         return Step(next_obs, reward, done, **info)
-

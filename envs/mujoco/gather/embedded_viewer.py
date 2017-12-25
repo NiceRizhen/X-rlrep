@@ -1,6 +1,6 @@
-from rllab.mujoco_py import glfw, mjcore
-import rllab.mujoco_py.mjconstants as C
-from rllab.mujoco_py.mjlib import mjlib
+from mujoco_py import glfw, mjcore
+import mujoco_py.mjconstants as C
+from mujoco_py.mjlib import mjlib
 from ctypes import byref
 import ctypes
 from threading import Lock

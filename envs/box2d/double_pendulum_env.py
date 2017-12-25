@@ -1,10 +1,10 @@
 import numpy as np
-from rllab.envs.box2d.parser import find_body
+from envs.box2d.parser import find_body
 
-from rllab.core.serializable import Serializable
-from rllab.envs.box2d.box2d_env import Box2DEnv
-from rllab.misc import autoargs
-from rllab.misc.overrides import overrides
+from core.serializable import Serializable
+from envs.box2d.box2d_env import Box2DEnv
+from misc import autoargs
+from misc.overrides import overrides
 
 
 # http://mlg.eng.cam.ac.uk/pilco/
@@ -59,4 +59,3 @@ class DoublePendulumEnv(Box2DEnv, Serializable):
 
     def is_current_done(self):
         return False
-

@@ -5,16 +5,16 @@ import xml.etree.ElementTree as ET
 from ctypes import byref
 import numpy as np
 
-from rllab.misc import logger
+from misc import logger
 from rllab import spaces
-from rllab.core.serializable import Serializable
-from rllab.envs.proxy_env import ProxyEnv
-from rllab.envs.base import Step
-from rllab.envs.mujoco.gather.embedded_viewer import EmbeddedViewer
-from rllab.envs.mujoco.mujoco_env import MODEL_DIR, BIG
-from rllab.misc import autoargs
-from rllab.misc.overrides import overrides
-from rllab.mujoco_py import MjViewer, MjModel, mjcore, mjlib, \
+from core.serializable import Serializable
+from envs.proxy_env import ProxyEnv
+from envs.base import Step
+from envs.mujoco.gather.embedded_viewer import EmbeddedViewer
+from envs.mujoco.mujoco_env import MODEL_DIR, BIG
+from misc import autoargs
+from misc.overrides import overrides
+from mujoco_py import MjViewer, MjModel, mjcore, mjlib, \
     mjextra, glfw
 
 APPLE = 0
@@ -426,6 +426,3 @@ class GatherEnv(ProxyEnv, Serializable):
                 wrapped_undiscounted_return = np.mean([np.sum(path['env_infos']['inner_rew']) for path in paths])
                 logger.record_tabular('AverageReturn', wrapped_undiscounted_return)
             self.wrapped_env.log_diagnostics(stripped_paths)  # see swimmer_env.py for a scketch of the maze plotting!
-
-
-

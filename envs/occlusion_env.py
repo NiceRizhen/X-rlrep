@@ -1,25 +1,25 @@
 import numpy as np
 from cached_property import cached_property
 
-from rllab import spaces
-from rllab.core.serializable import Serializable
-from rllab.envs.proxy_env import ProxyEnv
-from rllab.misc.overrides import overrides
-from rllab.envs.base import Step
-from rllab.envs.mujoco.mujoco_env import MujocoEnv
+import spaces
+from core.serializable import Serializable
+from envs.proxy_env import ProxyEnv
+from misc.overrides import overrides
+from envs.base import Step
+from envs.mujoco.mujoco_env import MujocoEnv
 
 BIG = 1e6
 
 class OcclusionEnv(ProxyEnv, Serializable):
     ''' Occludes part of the observation.'''
-    
+
     def __init__(self, env, sensor_idx):
         '''
         :param sensor_idx: list or ndarray of indices to be shown. Other indices will be occluded. Can be either list of
             integer indices or boolean mask.
         '''
         Serializable.quick_init(self, locals())
-        
+
         self._set_sensor_mask(env, sensor_idx)
         super(OcclusionEnv, self).__init__(env)
         self._dt = 1
@@ -38,10 +38,10 @@ class OcclusionEnv(ProxyEnv, Serializable):
             sensor_mask = np.zeros((obsdim,), dtype=np.bool)
             sensor_mask[sensor_idx] = 1
         self._sensor_mask = sensor_mask
-            
+
     def occlude(self, obs):
         return obs[self._sensor_mask]
-    
+
     def get_current_obs(self):
         return self.occlude(self._wrapped_env.get_current_obs())
 
@@ -51,7 +51,7 @@ class OcclusionEnv(ProxyEnv, Serializable):
         shp = self.get_current_obs().shape
         ub = BIG * np.ones(shp)
         return spaces.Box(ub * -1, ub)
-    
+
     @overrides
     def reset(self):
         obs = self._wrapped_env.reset()
@@ -61,13 +61,11 @@ class OcclusionEnv(ProxyEnv, Serializable):
     def step(self, action):
         next_obs, reward, done, info = self._wrapped_env.step(action)
         return Step(self.occlude(next_obs), reward, done, **info)
-    
+
     @property
     def dt(self):
         return self._dt
-    
+
     @overrides
     def log_diagnostics(self, paths):
         pass # the wrapped env will be expecting its own observations in paths, but they're not
-    
-

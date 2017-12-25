@@ -1,10 +1,10 @@
-from rllab.envs.mujoco.mujoco_env import MujocoEnv
-from rllab.core.serializable import Serializable
-from rllab.envs.base import Step
-from rllab.misc.overrides import overrides
-from rllab.misc import logger
+from envs.mujoco.mujoco_env import MujocoEnv
+from core.serializable import Serializable
+from envs.base import Step
+from misc.overrides import overrides
+from misc import logger
 
-from rllab.envs.mujoco.mujoco_env import q_mult, q_inv
+from envs.mujoco.mujoco_env import q_mult, q_inv
 import numpy as np
 import math
 
@@ -63,4 +63,3 @@ class AntEnv(MujocoEnv, Serializable):
         logger.record_tabular('MaxForwardProgress', np.max(progs))
         logger.record_tabular('MinForwardProgress', np.min(progs))
         logger.record_tabular('StdForwardProgress', np.std(progs))
-

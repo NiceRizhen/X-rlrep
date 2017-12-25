@@ -1,11 +1,11 @@
 import numpy as np
 
-from rllab.core.serializable import Serializable
-from rllab.envs.base import Step
-from rllab.envs.proxy_env import ProxyEnv
-from rllab.misc import autoargs
-from rllab.misc.overrides import overrides
-from rllab.spaces import Box
+from core.serializable import Serializable
+from envs.base import Step
+from envs.proxy_env import ProxyEnv
+from misc import autoargs
+from misc.overrides import overrides
+from spaces import Box
 
 
 class SlidingMemEnv(ProxyEnv, Serializable):
@@ -53,4 +53,3 @@ class SlidingMemEnv(ProxyEnv, Serializable):
         next_obs, reward, done, info = self._wrapped_env.step(action)
         self.add_to_buffer(next_obs)
         return Step(self.buffer, reward, done, **info)
-
