@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 import gym
 import matplotlib.pyplot as plt
-from rllab.algos.base import RLAlgorithm
-from rllab.algos.train_agent import trainAgent
+from algos.base import RLAlgorithm
+from algos.train_agent import trainAgent
 
 np.random.seed(1)
 tf.set_random_seed(1)

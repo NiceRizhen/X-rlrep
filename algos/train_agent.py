@@ -5,6 +5,7 @@ def trainAgent(self, Agent):
     episodes = []
     for i_episode in range(20):
         state = self.env.reset()
+        total_reward = 0
         while True:
             # self.env.render()
 
@@ -18,12 +19,14 @@ def trainAgent(self, Agent):
 
             if total_steps > self.memory_size:
                 Agent.learn()
-
-            if total_steps % 1000 == 0: 
+            '''
+            if total_steps % 1000 == 0:
                 print('\tTotal steps: ', total_steps)
+            '''
+            total_reward += reward
 
             if terminated:
-                print('Episode ', i_episode, ' finished')
+                print('Episode ', i_episode, '\ttotal reward: ', total_reward)
                 steps.append(total_steps)
                 episodes.append(i_episode)
                 break

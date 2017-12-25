@@ -1,4 +1,4 @@
-from rllab.algos.dueling_dqn import DuelingDQN
+from algos.value_based.dueling_dqn import DuelingDQN
 import gym
 
 env_name = 'MountainCar-v0'

@@ -1,4 +1,4 @@
-from rllab.algos.prioritized_dqn import PrioritizedReplayDQN
+from algos.value_based.prioritized_dqn import PrioritizedReplayDQN
 import gym
 
 env_name = 'MountainCar-v0'
