@@ -74,7 +74,6 @@ class NPO(BatchPolopt):
         lr = dist.likelihood_ratio_sym(action_var, old_dist_info_vars, dist_info_vars)
         if self.truncate_local_is_ratio is not None:
             lr = TT.minimum(self.truncate_local_is_ratio, lr)
-        if is_recurrent:
             mean_kl = TT.sum(kl * valid_var) / TT.sum(valid_var)
             surr_loss = - TT.sum(lr * advantage_var * valid_var) / TT.sum(valid_var)
         else:
