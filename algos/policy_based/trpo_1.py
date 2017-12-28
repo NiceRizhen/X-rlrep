@@ -89,7 +89,7 @@ class TRPOAgent(Agent):
         self.vf = VF(self.session)
         self.session.run(tf.initialize_all_variables())
 
-    def act(self, state):
+    def trainPolicy(self, state):
         state = np.expand_dims(state, 0)
         action_dist = self.session.run(self.action_dist, {self.state:state})
         if self.train:
@@ -101,6 +101,9 @@ class TRPOAgent(Agent):
         self.prev_action *= 0.0
         self.prev_action[0, action] = 1.0
         return action, action_dist, np.squeeze([state]) # HERE "state" is useless
+
+    def runPolicy(self, s):
+        pass
 
     def learn(self):
         start_time = time.time()

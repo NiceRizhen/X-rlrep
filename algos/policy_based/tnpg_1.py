@@ -72,16 +72,19 @@ class TNPGAgent(Agent):
         with tf.name_scope('train'):
             self.train_op = tf.train.AdamOptimizer(self.lr).minimize(loss)
 
-    def choose_action(self, observation):
+    def trainPolicy(self, observation):
         prob_weights = self.sess.run(self.all_act_prob, feed_dict={self.tf_obs: observation[np.newaxis, :]})
         action = np.random.choice(range(prob_weights.shape[1]), p=prob_weights.ravel())  # select action w.r.t the actions prob
         return action
 
-    def store_transition(self, s, a, r):
+    def observe(self, s, a, r):
         self.ep_obs.append(s)
         self.ep_as.append(a)
         self.ep_rs.append(r)
 
+    def runPolicy(self, s):
+        pass
+        
     def learn(self):
         # discount and normalize episode reward
         discounted_ep_rs_norm = self._discount_and_norm_rewards()
@@ -139,11 +142,11 @@ class TNPG(RLAlgorithm):
 
             while True:
 
-                action = tnpg.choose_action(observation)
+                action = tnpg.trainPolicy(observation)
 
                 observation_, reward, done, info = self.env.step(action)
 
-                tnpg.store_transition(observation, action, reward)
+                tnpg.observe(observation, action, reward)
 
                 if done:
                     ep_rs_sum = sum(tnpg.ep_rs)

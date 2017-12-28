@@ -81,7 +81,7 @@ class PPOAgent(Agent):
 
         self.sess.run(tf.global_variables_initializer())
 
-    def update(self, s, a, r):
+    def observe(self, s, a, r):
         self.sess.run(self.update_oldpi_op)
         adv = self.sess.run(self.advantage, {self.tfs: s, self.tfdc_r: r})
         # adv = (adv - adv.mean())/(adv.std()+1e-6)     # sometimes helpful
@@ -114,11 +114,14 @@ class PPOAgent(Agent):
         params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=name)
         return norm_dist, params
 
-    def choose_action(self, s):
+    def trainPolicy(self, s):
         s = s[np.newaxis, :]
         a = self.sess.run(self.sample_op, {self.tfs: s})[0]
         return np.clip(a, -2, 2)
 
+    def runPolicy(self, s):
+        pass
+        
     def get_v(self, s):
         if s.ndim < 2: s = s[np.newaxis, :]
         return self.sess.run(self.v, {self.tfs: s})[0, 0]
@@ -175,7 +178,7 @@ class PPO(RLAlgorithm):
             ep_r = 0
             for t in range(self.ep_len):    # in one episode
                 self.env.render()
-                a = ppo.choose_action(s)
+                a = ppo.trainPolicy(s)
                 s_, r, done, _ = self.env.step(a)
                 buffer_s.append(s)
                 buffer_a.append(a)
@@ -194,7 +197,7 @@ class PPO(RLAlgorithm):
 
                     bs, ba, br = np.vstack(buffer_s), np.vstack(buffer_a), np.array(discounted_r)[:, np.newaxis]
                     buffer_s, buffer_a, buffer_r = [], [], []
-                    ppo.update(bs, ba, br)
+                    ppo.observe(bs, ba, br)
             if ep == 0: all_ep_r.append(ep_r)
             else: all_ep_r.append(all_ep_r[-1]*0.9 + ep_r*0.1)
             print(

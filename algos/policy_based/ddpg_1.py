@@ -69,8 +69,11 @@ class DDPGAgent(Agent):
 
         self.sess.run(tf.global_variables_initializer())
 
-    def choose_action(self, s):
+    def trainPolicy(self, s):
         return self.sess.run(self.a, {self.S: s[np.newaxis, :]})[0]
+
+    def runPolicy(self, s):
+        pass
 
     def learn(self):
         # soft target replacement
@@ -86,7 +89,7 @@ class DDPGAgent(Agent):
         self.sess.run(self.atrain, {self.S: bs})
         self.sess.run(self.ctrain, {self.S: bs, self.a: ba, self.R: br, self.S_: bs_})
 
-    def store_transition(self, s, a, r, s_):
+    def observe(self, s, a, r, s_):
         transition = np.hstack((s, a, [r], s_))
         index = self.pointer % self.memory_capacity  # replace the old memory with new memory
         self.memory[index, :] = transition
@@ -160,11 +163,11 @@ class DDPG(RLAlgorithm):
             for j in range(self.max_ep_steps):
 
                 # Add exploration noise
-                a = ddpg.choose_action(s)
+                a = ddpg.trainPolicy(s)
                 a = np.clip(np.random.normal(a, var), -2, 2)    # add randomness to action selection for exploration
                 s_, r, done, info = self.env.step(a)
 
-                ddpg.store_transition(s, a, r / 10, s_)
+                ddpg.observe(s, a, r / 10, s_)
 
                 if ddpg.pointer > self.memory_capacity:
                     var *= .9995    # decay the action randomness

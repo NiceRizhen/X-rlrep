@@ -25,7 +25,7 @@ def rollout(env, agent, max_pathlength, n_timesteps):
         agent.prev_action *= 0.0
         # agent.prev_obs *= 0.0
         for _ in range(max_pathlength):
-            action, action_dist, ob = agent.act(ob)
+            action, action_dist, ob = agent.trainPolicy(ob)
             obs.append(ob)
             actions.append(action)
             action_dists.append(action_dist)
