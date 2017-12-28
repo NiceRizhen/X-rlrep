@@ -1,4 +1,4 @@
-from algos.policy_based.tnpg_1 import TNPG
+from algos.policy_based.tnpg import TNPG
 import gym
 
 env_name = 'MountainCar-v0'

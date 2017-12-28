@@ -1,4 +1,4 @@
-from algos.policy_based.ppo_1 import PPO
+from algos.policy_based.ppo import PPO
 import gym
 
 env_name = 'Pendulum-v0'

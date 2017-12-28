@@ -1,4 +1,4 @@
-from algos.policy_based.ddpg_1 import DDPG
+from algos.policy_based.ddpg import DDPG
 import gym
 
 env_name = 'Pendulum-v0'

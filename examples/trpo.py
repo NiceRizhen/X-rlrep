@@ -1,4 +1,4 @@
-from algos.policy_based.trpo_1 import TRPO, TRPOAgent
+from algos.policy_based.trpo import TRPO
 import gym
 
 env_name = 'CartPole-v0'
