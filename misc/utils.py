@@ -24,6 +24,7 @@ def rollout(env, agent, max_pathlength, n_timesteps):
         ob = env.reset()
         agent.prev_action *= 0.0
         # agent.prev_obs *= 0.0
+        count = 0
         for _ in range(max_pathlength):
             action, action_dist, ob = agent.trainPolicy(ob)
             obs.append(ob)
@@ -32,7 +33,7 @@ def rollout(env, agent, max_pathlength, n_timesteps):
             res = env.step(action)
             ob = res[0]
             rewards.append(res[1])
-            if res[2]:
+            if res[2] or count == max_pathlength-1:
                 path = {"obs": np.concatenate(np.expand_dims(obs, 0)),
                         "action_dists": np.concatenate(action_dists),
                         "rewards": np.array(rewards),
@@ -41,7 +42,8 @@ def rollout(env, agent, max_pathlength, n_timesteps):
                 agent.prev_action *= 0.0
                 # agent.prev_obs *= 0.0
                 break
-        timesteps_sofar += len(path["rewards"])
+            count += 1
+        timesteps_sofar += count
     return paths
 
 

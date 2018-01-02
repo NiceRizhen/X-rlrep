@@ -1,12 +1,11 @@
 def trainAgent(self, Agent):
 
     total_steps = 0
-    steps = []
-    episodes = []
-    for i_episode in range(20):
+    history = []
+    for i_episode in range(1000):
         observation = self.env.reset()
         total_reward = 0
-        while True:
+        for step in range(2000):
             # self.env.render()
 
             action = Agent.trainPolicy(observation)
@@ -24,12 +23,13 @@ def trainAgent(self, Agent):
                 print('\tTotal steps: ', total_steps)
             '''
             total_reward += reward
-
             if done:
-                print('Episode ', i_episode, '\ttotal reward: ', total_reward)
-                steps.append(total_steps)
-                episodes.append(i_episode)
                 break
 
             observation = observation_
             total_steps += 1
+
+        print("Episode #%d \tReward %d" % (i_episode, total_reward))
+        history.append(total_reward)
+
+    return history

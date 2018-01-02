@@ -84,7 +84,7 @@ class TNPGAgent(Agent):
 
     def runPolicy(self, s):
         pass
-        
+
     def learn(self):
         # discount and normalize episode reward
         discounted_ep_rs_norm = self._discount_and_norm_rewards()
@@ -136,16 +136,17 @@ class TNPG(RLAlgorithm):
             reward_decay=self.reward_decay
         )
 
+        history = []
         for i_episode in range(3000):
 
             observation = self.env.reset()
-
-            while True:
+            total_reward = 0
+            for step in range(2000):
 
                 action = tnpg.trainPolicy(observation)
 
                 observation_, reward, done, info = self.env.step(action)
-
+                total_reward += reward
                 tnpg.observe(observation, action, reward)
 
                 if done:
@@ -157,9 +158,10 @@ class TNPG(RLAlgorithm):
                         running_reward = running_reward * 0.99 + ep_rs_sum * 0.01
 
                     # if running_reward > DISPLAY_REWARD_THRESHOLD: RENDER = True     # rendering
-                    print("episode:", i_episode, "  reward:", int(running_reward))
+                    # print("episode:", i_episode, "  reward:", int(running_reward))
 
                     vt = tnpg.learn()
 
                     break
                 observation = observation_
+            print("Episode #%d\tReward %d" % (i_episode, total_reward))

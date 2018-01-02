@@ -1,7 +1,7 @@
 from algos.policy_based.trpo import TRPO
 import gym
 
-env_name = 'CartPole-v0'
+env_name = 'Acrobot-v1'
 env = gym.make(env_name)
 algo = TRPO(
     env=env,

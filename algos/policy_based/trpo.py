@@ -111,7 +111,6 @@ class TRPOAgent(Agent):
         numeptotal = 0
         while True:
             # Generating paths.
-            print("Rollout")
             paths = rollout(
                 self.env,
                 self,

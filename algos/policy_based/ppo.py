@@ -121,7 +121,7 @@ class PPOAgent(Agent):
 
     def runPolicy(self, s):
         pass
-        
+
     def get_v(self, s):
         if s.ndim < 2: s = s[np.newaxis, :]
         return self.sess.run(self.v, {self.tfs: s})[0, 0]
@@ -177,7 +177,7 @@ class PPO(RLAlgorithm):
             buffer_s, buffer_a, buffer_r = [], [], []
             ep_r = 0
             for t in range(self.ep_len):    # in one episode
-                self.env.render()
+                # self.env.render()
                 a = ppo.trainPolicy(s)
                 s_, r, done, _ = self.env.step(a)
                 buffer_s.append(s)
