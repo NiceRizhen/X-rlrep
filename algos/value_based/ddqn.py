@@ -107,7 +107,10 @@ class DoubleDQNAgent(Agent):
         return action
 
     def runPolicy(self, state):
-        pass
+        state = state[np.newaxis, :]
+        actions_value = self.sess.run(self.q_eval, feed_dict={self.s: state})
+        action = np.argmax(actions_value)
+        return action
 
     def learn(self):
         if self.learn_step_counter % self.replace_target_iter == 0:

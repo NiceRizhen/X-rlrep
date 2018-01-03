@@ -93,6 +93,9 @@ class DQNAgent(Agent):
             self.memory_counter = 0
         transition = np.hstack((state, [action, reward], newState))
         index = self.memory_counter % self.memory_size
+        print(index)
+        print(self.memory.shape)
+        print(transition.shape)
         self.memory[index, :] = transition
         self.memory_counter += 1
 
@@ -106,7 +109,10 @@ class DQNAgent(Agent):
         return action
 
     def runPolicy(self, state):
-        pass
+        state = state[np.newaxis, :]
+        actions_value = self.sess.run(self.q_eval, feed_dict={self.s: state})
+        action = np.argmax(actions_value)
+        return action
 
     def learn(self):
         if self.learn_step_counter % self.replace_target_iter == 0:
