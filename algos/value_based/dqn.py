@@ -92,10 +92,8 @@ class DQNAgent(Agent):
         if not hasattr(self, 'memory_counter'):
             self.memory_counter = 0
         transition = np.hstack((state, [action, reward], newState))
+
         index = self.memory_counter % self.memory_size
-        print(index)
-        print(self.memory.shape)
-        print(transition.shape)
         self.memory[index, :] = transition
         self.memory_counter += 1
 
@@ -148,6 +146,7 @@ class DQN(RLAlgorithm):
             env,
             memory_size,
             action_space,
+            n_features,
             learning_rate,
             reward_decay,
             e_greedy,
@@ -158,6 +157,7 @@ class DQN(RLAlgorithm):
         self.env=env
         self.memory_size=memory_size
         self.action_space=action_space
+        self.n_features=n_features
         self.learning_rate=learning_rate
         self.reward_decay=reward_decay
         self.e_greedy=e_greedy
@@ -173,7 +173,7 @@ class DQN(RLAlgorithm):
         with tf.variable_scope('natural'):
             DQN = DQNAgent(
                 n_actions=self.action_space,
-                n_features=2,
+                n_features=self.n_features,
                 e_greedy_increment=0.001,
                 sess=sess,
                 output_graph=True,
