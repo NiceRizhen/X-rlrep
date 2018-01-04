@@ -155,6 +155,7 @@ class DDQN(RLAlgorithm):
             env,
             memory_size,
             action_space,
+            n_features,
             learning_rate,
             reward_decay,
             e_greedy,
@@ -165,6 +166,7 @@ class DDQN(RLAlgorithm):
         self.env=env
         self.memory_size=memory_size
         self.action_space=action_space
+        self.n_features=n_features
         self.learning_rate=learning_rate
         self.reward_decay=reward_decay
         self.e_greedy=e_greedy
@@ -180,7 +182,7 @@ class DDQN(RLAlgorithm):
         with tf.variable_scope('Double_DQN'):
             double_DQN = DoubleDQNAgent(
                 n_actions=self.action_space,
-                n_features=2,
+                n_features=self.n_features,
                 e_greedy_increment=0.001,
                 sess=sess,
                 output_graph=True,

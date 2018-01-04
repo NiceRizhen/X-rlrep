@@ -303,8 +303,8 @@ class PrioritizedReplayDQN(RLAlgorithm):
 
         with tf.variable_scope('DQN_with_prioritized_replay'):
             RL_prio = PrioritizedReplayDQNAgent(
-                n_actions=3,
-                n_features=2,
+                n_actions=self.env.action_space.n,
+                n_features=self.env.observation_space.shape[0],
                 learning_rate=self.learning_rate,
                 reward_decay=self.reward_decay,
                 e_greedy=self.e_greedy,

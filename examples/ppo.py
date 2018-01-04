@@ -1,7 +1,7 @@
 from algos.policy_based.ppo import PPO
 import gym
 
-env_name = 'Pendulum-v0'
+env_name = 'CartPole-v0'
 env = gym.make(env_name)
 
 algo = PPO(
@@ -14,8 +14,9 @@ algo = PPO(
     batch=32,
     a_update_steps=10,
     c_update_steps=10,
-    s_dim=3,
-    a_dim=1,
+    s_dim=env.observation_space.shape[0],
+    # a_dim=env.action_space.shape[0],
+    a_dim=env.action_space.n
 )
 
 algo.train()

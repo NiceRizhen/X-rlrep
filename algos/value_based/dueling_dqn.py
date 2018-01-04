@@ -160,7 +160,6 @@ class DuelingDQN(RLAlgorithm):
             self,
             env,
             memory_size,
-            action_space,
             learning_rate,
             reward_decay,
             e_greedy,
@@ -170,7 +169,6 @@ class DuelingDQN(RLAlgorithm):
             ):
         self.env=env
         self.memory_size=memory_size
-        self.action_space=action_space
         self.learning_rate=learning_rate
         self.reward_decay=reward_decay
         self.e_greedy=e_greedy
@@ -186,8 +184,8 @@ class DuelingDQN(RLAlgorithm):
 
         with tf.variable_scope('dueling'):
             dueling_DQN = DuelingDQNAgent(
-                n_actions=self.action_space,
-                n_features=2,
+                n_actions=self.env.action_space.n,
+                n_features=self.env.observation_space.shape[0],
                 e_greedy_increment=0.001,
                 sess=sess,
                 dueling=True,
@@ -202,53 +200,3 @@ class DuelingDQN(RLAlgorithm):
         sess.run(tf.global_variables_initializer())
 
         dueling_dqn = trainAgent(self, dueling_DQN)
-
-'''
-        def run(RL):
-            acc_r = [0]
-            total_steps = 0
-            observation = self.env.reset()
-            while True:
-                # if total_steps-MEMORY_SIZE > 9000: env.render()
-
-                action = RL.choose_action(observation)
-
-                f_action = (action-(self.action_space-1)/2)/((self.action_space-1)/4)   # [-2 ~ 2] float actions
-                observation_, reward, done, info = self.env.step(np.array([f_action]))
-
-                reward /= 10      # normalize to a range of (-1, 0)
-                acc_r.append(reward + acc_r[-1])  # accumulated reward
-
-                RL.store_transition(observation, action, reward, observation_)
-
-                if total_steps > self.memory_size:
-                    RL.learn()
-
-                if total_steps-self.memory_size > 15000:
-                    break
-
-                observation = observation_
-                total_steps += 1
-            return RL.cost_his, acc_r
-
-        # c_natural, r_natural = run(natural_DQN)
-        c_dueling, r_dueling = run(dueling_DQN)
-
-        plt.figure(1)
-        # plt.plot(np.array(c_natural), c='r', label='natural')
-        plt.plot(np.array(c_dueling), c='b', label='dueling')
-        plt.legend(loc='best')
-        plt.ylabel('cost')
-        plt.xlabel('training steps')
-        plt.grid()
-
-        plt.figure(2)
-        # plt.plot(np.array(r_natural), c='r', label='natural')
-        plt.plot(np.array(r_dueling), c='b', label='dueling')
-        plt.legend(loc='best')
-        plt.ylabel('accumulated reward')
-        plt.xlabel('training steps')
-        plt.grid()
-
-        plt.show()
-'''
