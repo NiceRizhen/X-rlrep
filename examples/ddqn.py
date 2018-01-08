@@ -1,7 +1,7 @@
 from algos.value_based.ddqn import DDQN
 import gym
 
-env_name = 'CartPole-v0'
+env_name = 'Asterix-ram-v0'
 env = gym.make(env_name)
 
 algo = DDQN(

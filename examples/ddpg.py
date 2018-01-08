@@ -1,7 +1,7 @@
 from algos.policy_based.ddpg import DDPG
 import gym
 
-env_name = 'Pendulum-v0'
+env_name = 'BerzerkDeterministic-v0'
 env = gym.make(env_name)
 env = env.unwrapped
 env.seed(1)

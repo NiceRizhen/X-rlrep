@@ -1,7 +1,7 @@
 from algos.policy_based.ppo import PPO
 import gym
 
-env_name = 'CartPole-v0'
+env_name = 'MountainCarContinuous-v0'
 env = gym.make(env_name)
 
 algo = PPO(
@@ -15,8 +15,8 @@ algo = PPO(
     a_update_steps=10,
     c_update_steps=10,
     s_dim=env.observation_space.shape[0],
-    # a_dim=env.action_space.shape[0],
-    a_dim=env.action_space.n
+    a_dim=env.action_space.shape[0],
+    # a_dim=env.action_space.n
 )
 
 algo.train()

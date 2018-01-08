@@ -3,6 +3,7 @@ import tensorflow as tf
 from algos.base import RLAlgorithm
 from algos.agent import Agent
 from algos.train_agent import trainAgent
+import matplotlib.pyplot as plt
 
 np.random.seed(1)
 tf.set_random_seed(1)
@@ -196,3 +197,12 @@ class DDQN(RLAlgorithm):
         sess.run(tf.global_variables_initializer())
 
         ddqn = trainAgent(self, double_DQN)
+
+        plt.figure(1)
+        plt.plot(np.array(ddqn), c='b', label='DDQN')
+        plt.legend(loc='best')
+        plt.ylabel('reward')
+        plt.xlabel('episode')
+        plt.grid()
+
+        plt.show()
