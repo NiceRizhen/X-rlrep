@@ -4,6 +4,7 @@ import gym
 import matplotlib.pyplot as plt
 from algos.base import RLAlgorithm
 from algos.train_agent import trainAgent
+import matplotlib.pyplot as plt
 
 np.random.seed(1)
 tf.set_random_seed(1)
@@ -319,3 +320,12 @@ class PrioritizedReplayDQN(RLAlgorithm):
         sess.run(tf.global_variables_initializer())
 
         prioritized_dqn = trainAgent(self, RL_prio)
+
+        plt.figure(1)
+        plt.plot(np.array(prioritized_dqn), c='b', label='Prioritized_DQN')
+        plt.legend(loc='best')
+        plt.ylabel('reward')
+        plt.xlabel('episode')
+        plt.grid()
+
+        plt.show()

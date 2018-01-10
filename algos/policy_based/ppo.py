@@ -4,6 +4,7 @@ import tensorflow as tf
 from algos.base import RLAlgorithm
 from algos.agent import Agent
 from algos.train_agent import trainAgent
+import matplotlib.pyplot as plt
 
 METHOD = [
     dict(name='kl_pen', kl_target=0.01, lam=0.5),   # KL penalty
@@ -171,6 +172,7 @@ class PPO(RLAlgorithm):
             a_dim=self.a_dim
         )
         all_ep_r = []
+        history = []
 
         for ep in range(self.ep_max):
             s = self.env.reset()
@@ -198,6 +200,8 @@ class PPO(RLAlgorithm):
                     bs, ba, br = np.vstack(buffer_s), np.vstack(buffer_a), np.array(discounted_r)[:, np.newaxis]
                     buffer_s, buffer_a, buffer_r = [], [], []
                     ppo.observe(bs, ba, br)
+
+            history.append(ep_r)
             if ep == 0: all_ep_r.append(ep_r)
             else: all_ep_r.append(all_ep_r[-1]*0.9 + ep_r*0.1)
             print(
@@ -205,3 +209,12 @@ class PPO(RLAlgorithm):
                 "|Ep_r: %i" % ep_r,
                 ("|Lam: %.4f" % METHOD['lam']) if METHOD['name'] == 'kl_pen' else '',
             )
+
+        plt.figure(1)
+        plt.plot(np.array(history), c='b', label='PPO')
+        plt.legend(loc='best')
+        plt.ylabel('reward')
+        plt.xlabel('episode')
+        plt.grid()
+
+        plt.show()

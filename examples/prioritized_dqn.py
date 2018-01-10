@@ -1,7 +1,7 @@
 from algos.value_based.prioritized_dqn import PrioritizedReplayDQN
 import gym
 
-env_name = 'CartPole-v0'
+env_name = 'MountainCar-v0'
 env = gym.make(env_name)
 env = env.unwrapped
 algo = PrioritizedReplayDQN(

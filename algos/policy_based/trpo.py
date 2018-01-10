@@ -13,6 +13,7 @@ import tempfile
 import sys
 from algos.base import RLAlgorithm
 from algos.agent import Agent
+import matplotlib.pyplot as plt
 
 dtype = tf.float32
 eps = 1e-6
@@ -95,7 +96,7 @@ class TRPOAgent(Agent):
         if self.train:
             action = int(cat_sample(action_dist)[0])
         else:
-            self.env.render()
+            # self.env.render()
             action = int(np.argmax(action_dist))
 
         self.prev_action *= 0.0
@@ -109,7 +110,8 @@ class TRPOAgent(Agent):
         start_time = time.time()
         i = 0
         numeptotal = 0
-        while True:
+        history = []
+        for i in range(self.max_steps):
             # Generating paths.
             paths = rollout(
                 self.env,
@@ -148,7 +150,6 @@ class TRPOAgent(Agent):
                 return self.session.run(self.losses[0], feed_dict=feed)
 
             episoderewards = np.array([path["rewards"].sum() for path in paths])
-
             print("\n********** Iteration %i ************" % i)
 
             if episoderewards.mean() > 1.1*500:
@@ -180,6 +181,8 @@ class TRPOAgent(Agent):
                 numeptotal += len(episoderewards)
                 stats["Total number of episodes"] = numeptotal
                 stats["Average sum of rewards per episode"] = episoderewards.mean()
+
+                history.append(episoderewards.mean())
                 stats["Entropy"] = entropy
                 exp = explained_variance(np.array(baseline), np.array(returns))
                 stats["Baseline explained"] = exp
@@ -193,7 +196,7 @@ class TRPOAgent(Agent):
                 if exp > 0.8:
                     self.train = False
             i += 1
-
+        return history
 
 class TRPO(RLAlgorithm):
     def __init__(
@@ -225,4 +228,13 @@ class TRPO(RLAlgorithm):
             max_kl=self.max_kl
         )
 
-        trpo.learn()
+        history = trpo.learn()
+
+        plt.figure(1)
+        plt.plot(np.array(history), c='b', label='TRPO')
+        plt.legend(loc='best')
+        plt.ylabel('reward')
+        plt.xlabel('episode')
+        plt.grid()
+
+        plt.show()

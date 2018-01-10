@@ -2,7 +2,7 @@ def trainAgent(self, Agent):
 
     total_steps = 0
     history = []
-    for i_episode in range(1000):
+    for i_episode in range(100):
         observation = self.env.reset()
         total_reward = 0
         for step in range(2000):

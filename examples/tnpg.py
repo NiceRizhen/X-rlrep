@@ -1,7 +1,7 @@
 from algos.policy_based.tnpg import TNPG
 import gym
 
-env_name = 'CartPole-v0'
+env_name = 'MountainCar-v0'
 env = gym.make(env_name)
 env.seed(1)     # reproducible, general Policy gradient has high variance
 env = env.unwrapped

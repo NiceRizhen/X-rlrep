@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 from algos.base import RLAlgorithm
 from algos.agent import Agent
+import matplotlib.pyplot as plt
 
 DISPLAY_REWARD_THRESHOLD = 400  # renders environment if total episode reward is greater then this threshold
 RENDER = False  # rendering wastes time
@@ -137,7 +138,7 @@ class TNPG(RLAlgorithm):
         )
 
         history = []
-        for i_episode in range(3000):
+        for i_episode in range(100):
 
             observation = self.env.reset()
             total_reward = 0
@@ -165,3 +166,13 @@ class TNPG(RLAlgorithm):
                     break
                 observation = observation_
             print("Episode #%d\tReward %d" % (i_episode, total_reward))
+            history.append(total_reward)
+
+        plt.figure(1)
+        plt.plot(np.array(history), c='b', label='TNPG')
+        plt.legend(loc='best')
+        plt.ylabel('reward')
+        plt.xlabel('episode')
+        plt.grid()
+
+        plt.show()

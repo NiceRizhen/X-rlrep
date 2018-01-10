@@ -1,13 +1,13 @@
 from algos.policy_based.ppo import PPO
 import gym
 
-env_name = 'MountainCarContinuous-v0'
+env_name = 'CarRacing-v0'
 env = gym.make(env_name)
 
 algo = PPO(
     env=env,
-    ep_max=1000,
-    ep_len=200,
+    ep_max=100,
+    ep_len=2000,
     gamma=0.9,
     a_lr=0.0001,
     c_lr=0.0002,

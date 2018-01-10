@@ -1,7 +1,7 @@
 from algos.value_based.dqn import DQN
 import gym
 
-env_name = 'Boxing-ram-v4'
+env_name = 'MountainCar-v0'
 env = gym.make(env_name)
 
 algo = DQN(

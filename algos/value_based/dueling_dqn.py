@@ -4,6 +4,7 @@ import gym
 import matplotlib.pyplot as plt
 from algos.base import RLAlgorithm
 from algos.train_agent import trainAgent
+import matplotlib.pyplot as plt
 
 np.random.seed(1)
 tf.set_random_seed(1)
@@ -200,3 +201,12 @@ class DuelingDQN(RLAlgorithm):
         sess.run(tf.global_variables_initializer())
 
         dueling_dqn = trainAgent(self, dueling_DQN)
+
+        plt.figure(1)
+        plt.plot(np.array(dueling_dqn), c='b', label='Dueling_DQN')
+        plt.legend(loc='best')
+        plt.ylabel('reward')
+        plt.xlabel('episode')
+        plt.grid()
+
+        plt.show()

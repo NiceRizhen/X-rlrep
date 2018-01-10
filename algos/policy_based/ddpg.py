@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 from algos.base import RLAlgorithm
 from algos.agent import Agent
+import matplotlib.pyplot as plt
 
 
 class DDPGAgent(Agent):
@@ -155,7 +156,7 @@ class DDPG(RLAlgorithm):
                 memory_capacity=self.memory_capacity,
                 batch_size=self.batch_size
                 )
-
+        history = []
         var = 3  # control exploration
         for i in range(self.max_episodes):
             s = self.env.reset()
@@ -179,3 +180,13 @@ class DDPG(RLAlgorithm):
                     print('Episode:', i, ' Reward: %i' % int(ep_reward), 'Explore: %.2f' % var, )
                     # if ep_reward > -300:RENDER = True
                     break
+            history.append(ep_reward)
+
+        plt.figure(1)
+        plt.plot(np.array(history), c='b', label='DDPG')
+        plt.legend(loc='best')
+        plt.ylabel('reward')
+        plt.xlabel('episode')
+        plt.grid()
+
+        plt.show()
